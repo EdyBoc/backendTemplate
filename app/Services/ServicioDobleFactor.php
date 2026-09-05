@@ -2,6 +2,12 @@
 
 namespace App\Services;
 
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
+
 class ServicioDobleFactor
 {
     private const ALFABETO_BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -39,12 +45,12 @@ class ServicioDobleFactor
 
     public function generarUri(string $correoElectronico, string $secreto, string $emisor): string
     {
-        $etiqueta = rawurlencode($emisor.':'.$correoElectronico);
+        $etiqueta = rawurlencode($emisor . ':' . $correoElectronico);
 
-        return 'otpauth://totp/'.$etiqueta
-            .'?secret='.$secreto
-            .'&issuer='.rawurlencode($emisor)
-            .'&digits=6&period=30';
+        return 'otpauth://totp/' . $etiqueta
+            . '?secret=' . $secreto
+            . '&issuer=' . rawurlencode($emisor)
+            . '&digits=6&period=30';
     }
 
     private function generarCodigo(string $secreto, int $contador): string
@@ -85,5 +91,19 @@ class ServicioDobleFactor
         }
 
         return $resultado;
+    }
+
+    public function generarCodigoQr(string $uriConfiguracion): string
+    {
+        $codigoQr = QrCode::create($uriConfiguracion)
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(ErrorCorrectionLevel::High)
+            ->setSize(260)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(RoundBlockSizeMode::Margin);
+
+        $resultado = (new SvgWriter())->write($codigoQr);
+
+        return $resultado->getDataUri();
     }
 }

@@ -16,22 +16,52 @@
             <button class="botonPeligro" type="submit">Desactivar doble factor</button>
         </form>
     @else
-        <p class="textoAyuda">Agregue una cuenta TOTP en Google Authenticator, Microsoft Authenticator u otra aplicación compatible.</p>
-        <div class="campo">
-            <label>Clave secreta</label>
-            <span class="codigo">{{ $secretoTemporal }}</span>
+        <p class="textoAyuda">
+            Escanee el código QR con Google Authenticator,
+            Microsoft Authenticator u otra aplicación compatible.
+        </p>
+
+        <div class="contenedorQr">
+            <img
+                class="imagenQr"
+                src="{{ $codigoQr }}"
+                alt="Código QR para configurar la autenticación de doble factor"
+                width="260"
+                height="260"
+            >
         </div>
-        <div class="campo">
-            <label>URI de configuración</label>
-            <span class="codigo">{{ $uriConfiguracion }}</span>
+
+        <div class="configuracionManual">
+            <p class="tituloConfiguracionManual">
+                ¿No puede escanearlo?
+            </p>
+
+            <div class="campo">
+                <label>Clave secreta</label>
+                <span class="codigo">{{ $secretoTemporal }}</span>
+            </div>
         </div>
+
         <form method="POST" action="{{ route('dobleFactor.activar') }}">
             @csrf
+
             <div class="campo">
                 <label for="codigo">Código de 6 dígitos</label>
-                <input id="codigo" name="codigo" inputmode="numeric" maxlength="6" required>
+
+                <input
+                    id="codigo"
+                    name="codigo"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    required
+                >
             </div>
-            <button type="submit">Activar doble factor</button>
+
+            <button type="submit">
+                Activar doble factor
+            </button>
         </form>
     @endif
 @endsection

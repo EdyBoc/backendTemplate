@@ -11,9 +11,7 @@ use Illuminate\View\View;
 
 class ControladorDobleFactor extends Controller
 {
-    public function __construct(private readonly ServicioDobleFactor $servicioDobleFactor)
-    {
-    }
+    public function __construct(private readonly ServicioDobleFactor $servicioDobleFactor) {}
 
     public function mostrar(Request $request): View
     {
@@ -22,6 +20,9 @@ class ControladorDobleFactor extends Controller
 
         $secretoTemporal = null;
         $uriConfiguracion = null;
+        $secretoTemporal = null;
+        $uriConfiguracion = null;
+        $codigoQr = null;
 
         if (! $usuario->dobleFactorHabilitado) {
             $secretoTemporal = $request->session()->get('dobleFactorSecretoTemporal');
@@ -36,9 +37,11 @@ class ControladorDobleFactor extends Controller
                 $secretoTemporal,
                 (string) config('app.name')
             );
+
+            $codigoQr = $this->servicioDobleFactor->generarCodigoQr($uriConfiguracion);
         }
 
-        return view('configuracion.dobleFactor', compact('usuario', 'secretoTemporal', 'uriConfiguracion'));
+        return view('configuracion.dobleFactor', compact('usuario', 'secretoTemporal', 'uriConfiguracion', 'codigoQr'));
     }
 
     public function activar(Request $request): RedirectResponse
